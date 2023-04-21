@@ -1,17 +1,18 @@
 from django.db import models
 
+
 class Tag(models.Model):
     name = models.CharField(
         'Название',
         unique=True,
-        max_length=256,
+        max_length=200,
         help_text='Введите название',
         verbose_name='Название',
     )
     color = models.CharField(
         'Цвет',
         unique=True,
-        max_length=256,
+        max_length=10,
         help_text='Введите цвет в HEX-формате',
         verbose_name='Цвет',
         blank=True,
@@ -23,7 +24,6 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Адрес',
     )
-
 
     class Meta:
         ordering = ('-name',)

@@ -1,8 +1,10 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 from tags.models import Tag
 from ingredients.models import Ingredient
 from users.models import User
+
 
 class Reciepe(models.Model):
     created = models.DateTimeField(
@@ -19,12 +21,12 @@ class Reciepe(models.Model):
     name = models.CharField(
         "Название",
         unique=True,
-        max_length=256,
+        max_length=200,
         help_text="Введите название",
     )
     image = models.ImageField(
         verbose_name='Картинка',
-        upload_to='Reciepes/images/',
+        upload_to='Reciepes/',
         blank=True,
         null=True,
     )
@@ -39,7 +41,7 @@ class Reciepe(models.Model):
         help_text='Выберите ингредиенты',
     )
     tags = models.ManyToManyField(
-        Tag, 
+        Tag,
         through='TagRecipe',
         verbose_name='Теги',
         help_text='Выберите теги',
@@ -51,19 +53,23 @@ class Reciepe(models.Model):
         verbose_name_plural = 'Рецепты'
 
     def __str__(self):
-        return f'id: {self.id} Автор: {str(self.author)} Название: {self.name[:15]}'
+        return (
+            f'id: {self.id} Автор: {str(self.author)} Название: {self.name[:15]}'
+        )
 
 
 class FavoriteRecipe(Reciepe, User):
-        class Meta:
-            constraints = [
-                models.UniqueConstraint(
-                    name='unique_favorite',
-                    fields=['recipe', 'user'],
-                ),
-            ]
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                name='unique_favorite',
+                fields=['recipe', 'user'],
+            ),
+        ]
         verbose_name = 'Любимый рецепт'
         verbose_name_plural = 'Любимые рецепты'
+
 
 class ShoppingCartRecipe(Reciepe, User):
     class Meta:
@@ -76,10 +82,11 @@ class ShoppingCartRecipe(Reciepe, User):
         verbose_name = 'Рецепт в корзине пользователя'
         verbose_name_plural = 'Рецепты в корзинах пользователей'
 
+
 class IngredientInRecipe(Reciepe):
     ingredient = models.ForeignKey(
         Ingredient,
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
         verbose_name='Ингредиент рецепта',
         help_text='Выберите ингредиент рецепта',
     )
@@ -87,6 +94,7 @@ class IngredientInRecipe(Reciepe):
         'Количество ингридиента',
         help_text='Введите количество ингридиента',
         verbose_name='Количество ингридиента',
+        validators=[MinValueValidator(1)],
         )
 
     class Meta:
@@ -98,10 +106,11 @@ class IngredientInRecipe(Reciepe):
             f'{self.ingredient.name} — {self.amount} {self.ingredient.measure}'
         )
 
+
 class TagRecipe(Reciepe):
     tag = models.ForeignKey(
         Tag,
-        on_delete=models.RESTRICT,
+        on_delete=models.DO_NOTHING,
         verbose_name='Тег',
         help_text='Выберите из списка тег',
     )

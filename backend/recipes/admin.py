@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Reciepe, 
-    IngredientInRecipe, 
+    Reciepe,
+    IngredientInRecipe,
     FavoriteRecipe,
     TagRecipe,
     ShoppingCartRecipe,
@@ -37,7 +37,7 @@ class RecipeAdmin(admin.ModelAdmin):
     def ingredients_in_recipe(self):
         pass
     list_display = (
-        'id',
+        'pk',
         'name',
         'author',
     )
@@ -62,7 +62,7 @@ class RecipeAdmin(admin.ModelAdmin):
 @admin.register(IngredientInRecipe)
 class IngredientInRecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'pk',
         'recipe',
         'ingredient',
         'amount',
@@ -77,7 +77,7 @@ class IngredientInRecipeAdmin(admin.ModelAdmin):
 @admin.register(FavoriteRecipe)
 class FavoriteRecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'pk',
         'recipe',
         'user',
     )
@@ -90,7 +90,7 @@ class FavoriteRecipeAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCartRecipe)
 class ShoppingCartRecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'pk',
         'recipe',
         'user',
     )
@@ -103,7 +103,7 @@ class ShoppingCartRecipeAdmin(admin.ModelAdmin):
 @admin.register(TagRecipe)
 class TagRecipeAdmin(admin.ModelAdmin):
     list_display = (
-        'id',
+        'pk',
         'recipe',
         'tag',
     )
