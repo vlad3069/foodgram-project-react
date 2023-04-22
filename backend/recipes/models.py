@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator
 
 from tags.models import Tag
 from ingredients.models import Ingredient
-from users.models import User
+from users.models import User, UserСonnection
 
 
 class Reciepe(models.Model):
@@ -15,23 +15,23 @@ class Reciepe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='Reciepes',
+        related_name='reciepes',
         verbose_name='Автор',
     )
     name = models.CharField(
-        "Название",
+        'Название',
         unique=True,
         max_length=200,
-        help_text="Введите название",
+        help_text='Введите название',
     )
     image = models.ImageField(
-        verbose_name='Картинка',
+        'Картинка',
         upload_to='Reciepes/',
         blank=True,
         null=True,
     )
     text = models.TextField(
-        verbose_name='Текст поста',
+        'Текст поста',
         help_text='Введите текст поста',
     )
     ingredients = models.ManyToManyField(
@@ -58,7 +58,19 @@ class Reciepe(models.Model):
         )
 
 
-class FavoriteRecipe(Reciepe, User):
+class RecipeСonnection(models.Model):
+    recipe = models.ForeignKey(
+        Reciepe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт',
+        help_text='Выберите рецепт',
+    )
+
+    class Meta:
+        abstract = True
+
+
+class FavoriteRecipe(RecipeСonnection, UserСonnection):
 
     class Meta:
         constraints = [
@@ -71,7 +83,7 @@ class FavoriteRecipe(Reciepe, User):
         verbose_name_plural = 'Любимые рецепты'
 
 
-class ShoppingCartRecipe(Reciepe, User):
+class ShoppingCartRecipe(RecipeСonnection, UserСonnection):
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -83,7 +95,7 @@ class ShoppingCartRecipe(Reciepe, User):
         verbose_name_plural = 'Рецепты в корзинах пользователей'
 
 
-class IngredientInRecipe(Reciepe):
+class IngredientInRecipe(RecipeСonnection):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -93,7 +105,6 @@ class IngredientInRecipe(Reciepe):
     amount = models.PositiveSmallIntegerField(
         'Количество ингридиента',
         help_text='Введите количество ингридиента',
-        verbose_name='Количество ингридиента',
         validators=[MinValueValidator(1)],
         )
 
@@ -107,7 +118,7 @@ class IngredientInRecipe(Reciepe):
         )
 
 
-class TagRecipe(Reciepe):
+class TagRecipe(RecipeСonnection):
     tag = models.ForeignKey(
         Tag,
         on_delete=models.DO_NOTHING,

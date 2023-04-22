@@ -7,13 +7,11 @@ class Ingredient(models.Model):
         unique=True,
         max_length=200,
         help_text='Введите название',
-        verbose_name='Название',
     )
     measure = models.CharField(
         'Единица измерения',
         max_length=200,
         help_text='Введите единицу измерения',
-        verbose_name='Единица измерения',
     )
 
     class Meta:

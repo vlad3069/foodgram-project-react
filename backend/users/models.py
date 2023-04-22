@@ -46,13 +46,19 @@ class User(AbstractUser):
         return self.username[:15]
 
 
-class Subscription(models.Model):
+class UserСonnection(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Пользователь',
         help_text='Выберите из списка пользователя',
     )
+
+    class Meta:
+        abstract = True
+
+
+class Subscription(UserСonnection):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

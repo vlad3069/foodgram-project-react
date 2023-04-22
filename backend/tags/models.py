@@ -7,14 +7,12 @@ class Tag(models.Model):
         unique=True,
         max_length=200,
         help_text='Введите название',
-        verbose_name='Название',
     )
     color = models.CharField(
         'Цвет',
         unique=True,
         max_length=10,
         help_text='Введите цвет в HEX-формате',
-        verbose_name='Цвет',
         blank=True,
         null=True,
     )
@@ -22,7 +20,6 @@ class Tag(models.Model):
         'Slug',
         null=False,
         unique=True,
-        verbose_name='Адрес',
     )
 
     class Meta:
