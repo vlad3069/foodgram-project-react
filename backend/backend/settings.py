@@ -13,7 +13,12 @@ SECRET_KEY = '19ihlm7%rj2tqqyd9qzof8feyjuw&lb3fggj_18whb=kd(jx%j'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'backend',
+    'db'
+]
 
 
 # Application definition
@@ -28,7 +33,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
-    'django_filters',
     'api.apps.ApiConfig',
     'ingredients.apps.IngredientsConfig',
     'tags.apps.TagsConfig',
@@ -117,9 +121,22 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+
 }
 
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+
+    "SERIALIZERS": {
+        "user": "api.serializers.UserSerializer",
+        "current_user": "api.serializers.UserSerializer",
+    },
+    "PERMISSIONS": {
+        "user": ["rest_framework.permissions.IsAuthenticated"],
+        "user_list": ["rest_framework.permissions.AllowAny"],
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
