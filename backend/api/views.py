@@ -1,33 +1,22 @@
-from djoser.views import TokenCreateView
-from rest_framework import status, permissions, viewsets
 from django.db.models import Sum
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.http import Http404, HttpResponse, JsonResponse
-from rest_framework.permissions import IsAuthenticated
-from api.permissions import IsAuthorOrReadOnly
-from api.mixins import CreateListDestroyViewSet
+from djoser.views import TokenCreateView
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from api.serializers import (
-    TagSerializer,
-    SubscripeSerializer,
-    IngredientSerializer,
-    RecipeListSerializer,
-    RecipeCreateSerializer,
-    RecipeSerializer
-)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+from api.mixins import CreateListDestroyViewSet
+from api.permissions import IsAuthorOrReadOnly
+from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
+                             RecipeListSerializer, RecipeSerializer,
+                             SubscripeSerializer, TagSerializer)
 from ingredients.models import Ingredient
-from recipes.models import (
-    Reciepe,
-    FavoriteRecipe,
-    ShoppingCartRecipe,
-    IngredientInRecipe
-)
+from recipes.models import (FavoriteRecipe, IngredientInRecipe, Reciepe,
+                            ShoppingCartRecipe)
 from tags.models import Tag
-from users.models import (
-    User,
-    Subscription,
-)
+from users.models import Subscription, User
 
 
 class TokenCreateView(TokenCreateView):
