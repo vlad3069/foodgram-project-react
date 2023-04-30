@@ -54,7 +54,7 @@ class Reciepe(models.Model):
 
     def __str__(self):
         return (
-            f'id: {self.id} Автор: {str(self.author)} Название: {self.name[:15]}'
+            f'Автор: {str(self.author)} Название: {self.name[:15]}'
         )
 
 

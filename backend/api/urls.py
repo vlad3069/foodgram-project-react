@@ -4,6 +4,10 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import (
     TokenCreateView,
+    TagViewSet,
+    RecipesSubscriptionViewSet,
+    IngredientViewSet,
+    ReciepeViewSet,
 )
 
 auth_urls_v1 = [
@@ -19,9 +23,22 @@ users_urls_v1 = [
     path(r'me/', UserViewSet.as_view({'get': 'me'}), name='me'),
     path(r'set_password/', UserViewSet.as_view({'post': 'set_password'}),
          name='set-password'),
+    path(r'subscriptions/',
+         RecipesSubscriptionViewSet.as_view({'get': 'list'}),
+         name='subscriptions',
+         ),
+    path(r'<int:author_id>/subscribe/',
+         RecipesSubscriptionViewSet.as_view(
+          {"post": "create", "delete": "destroy"}),
+         name='subscribe',
+         ),
 ]
 
+
 router_v1 = DefaultRouter()
+router_v1.register(r'tags', TagViewSet, basename='tags')
+router_v1.register(r'ingredients', IngredientViewSet, basename='ingredients')
+router_v1.register(r'reciepes', ReciepeViewSet, basename='reciepes')
 
 urlpatterns = [
     path(r'auth/', include(auth_urls_v1)),
