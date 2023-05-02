@@ -106,7 +106,7 @@ class IngredientInRecipe(RecipeСonnection):
         'Количество ингридиента',
         help_text='Введите количество ингридиента',
         validators=[MinValueValidator(1)],
-        )
+    )
 
     class Meta:
         verbose_name = 'Ингредиент рецепта'

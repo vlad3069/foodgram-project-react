@@ -26,12 +26,15 @@ class Command(BaseCommand):
                         if verbosity > 1:
                             self.stdout.write(
                                 self.style.SUCCESS(
-                                    f"{obj} - создан: {'да' if created else 'нет'}"
+                                    f"{obj} - создан: "
+                                    "{'да' if created else 'нет'}"
                                 )
                             )
                     if verbosity > 0:
-                        self.stdout.write(self.style.SUCCESS(f"{file_name} - готово"))
+                        self.stdout.write(self.style.SUCCESS(
+                            f"{file_name} - готово"))
             except Exception as error:
                 raise CommandError(
-                    f"При загрузке файла {file_name} произошла ошибка." f"\r\n{error}"
+                    f"При загрузке файла {file_name} произошла ошибка."
+                    f"\r\n{error}"
                 )

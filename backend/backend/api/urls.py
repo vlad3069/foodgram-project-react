@@ -24,7 +24,7 @@ users_urls_v1 = [
          ),
     path(r'<int:author_id>/subscribe/',
          RecipesSubscriptionViewSet.as_view(
-          {"post": "create", "delete": "destroy"}),
+             {"post": "create", "delete": "destroy"}),
          name='subscribe',
          ),
 ]

@@ -1,16 +1,15 @@
 from django.db.models import Sum
 from django.http import Http404, HttpResponse, JsonResponse
-from djoser.views import TokenCreateView
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import TokenCreateView
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from django.db.models.query_utils import Q
 from rest_framework.response import Response
 
-from api.mixins import CreateListDestroyViewSet
 from api.filters import ReciepeFilter
+from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
@@ -18,7 +17,7 @@ from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              SubscripeSerializer, TagSerializer)
 from ingredients.models import Ingredient
 from recipes.models import (FavoriteRecipe, IngredientInRecipe, Reciepe,
-                            ShoppingCartRecipe, TagRecipe)
+                            ShoppingCartRecipe)
 from tags.models import Tag
 from users.models import Subscription, User
 
@@ -111,47 +110,6 @@ class ReciepeViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return RecipeListSerializer
         return RecipeCreateSerializer
-
-    """def get_queryset(self):
-        
-        queryset = Reciepe.objects.all()
-        user = self.request.user
-        is_favorited = self.request.query_params.get('is_favorited')
-        if is_favorited:
-            recipes_id = (
-                FavoriteRecipe.objects.filter(user=user).values('recipe__id')
-                if user.is_authenticated
-                else []
-            )
-            condition = Q(id__in=recipes_id)
-            queryset = queryset.filter(
-                condition if is_favorited == '1' else ~condition
-            ).all()
-        is_in_shopping_cart = self.request.query_params.get(
-            'is_in_shopping_cart')
-        if is_in_shopping_cart:
-            recipes_id = (
-                ShoppingCartRecipe.objects.filter(user=user).values(
-                                                                'recipe__id')
-                if user.is_authenticated
-                else []
-            )
-            condition = Q(id__in=recipes_id)
-            queryset = queryset.filter(
-                condition if is_in_shopping_cart == '1' else ~condition
-            ).all()
-        author_id = self.request.query_params.get('author')
-        if author_id:
-            queryset = queryset.filter(author__id=author_id).all()
-        tags = self.request.query_params.getlist('tags')
-        if tags:
-            tags = Tag.objects.filter(slug__in=tags).all()
-            recipes_id = (
-                TagRecipe.objects.filter(tag__in=tags).values(
-                    'recipe__id').distinct()
-            )
-            queryset = queryset.filter(id__in=recipes_id)
-        return queryset"""
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
