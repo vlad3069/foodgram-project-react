@@ -56,7 +56,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-              sudo docker pull tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_v1:latest
+              sudo docker pull: ${{ secrets.DOCKER_USERNAME }}/foodgram_v1:latest
               sudo docker stop $(sudo docker ps -a -q)
               sudo docker-compose down -v
               touch .env
