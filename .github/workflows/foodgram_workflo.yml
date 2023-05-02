@@ -57,7 +57,7 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
               sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_v1:latest
-              cd backend_infra
+              cd backend/infra/
               sudo docker-compose down
               touch .env
               echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
