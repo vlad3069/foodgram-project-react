@@ -36,7 +36,8 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-              mkdir projects
+              echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+              ssh ${{ secrets.USER }}@${{ secrets.HOST }} 'bash --login -s' < deploy.sh
               cd projects && mkdir -p foodgram && mkdir -p foodgram/docs              
               scp -r /infra ${{ secrets.USER }}@${{ secrets.HOST }}:/${{ secrets.USER }}/projects/infra
               scp -r /docs ${{ secrets.USER }}@${{ secrets.HOST }}:/${{ secrets.USER }}/projects/docs
