@@ -33,6 +33,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
+        privateKey: ${{ secrets.PRIVATE_KEY}}
         passphrase: ${{ secrets.PASSPHRASE }}
         command: cd projects && mkdir -p foodgram && mkdir -p foodgram/docs
 
@@ -43,6 +44,7 @@ jobs:
           remote: /${{ secrets.USER }}/projects/foodgram/
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
+          privateKey: ${{ secrets.PRIVATE_KEY}}
           passphrase: ${{ secrets.PASSPHRASE }}
 
     - name: Copy docs
