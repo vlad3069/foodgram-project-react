@@ -29,13 +29,15 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Create projects directory
-      uses: garygrossgarten/github-action-ssh@release
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        privateKey: ${{ secrets.PRIVATE_KEY}}
+        key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        command: cd projects && mkdir -p foodgram && mkdir -p foodgram/docs
+        script: |
+              cd projects && mkdir -p foodgram && mkdir -p foodgram/docs
+
 
     - name: Copy infra files
       uses: garygrossgarten/github-action-scp@release
