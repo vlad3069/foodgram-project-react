@@ -36,6 +36,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
+              mkdir projects
               cd projects && mkdir -p foodgram && mkdir -p foodgram/docs
 
 
