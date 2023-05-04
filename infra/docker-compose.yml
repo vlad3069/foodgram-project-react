@@ -10,7 +10,8 @@ services:
 
   frontend:
     build:
-      image: vlad9603/foodgram_front_v1:latest
+      context: ../frontend
+      dockerfile: Dockerfile
     volumes:
       - .foodgram/frontend/:/app/result_build/
       - static_value:/app/result_build/build/static/
