@@ -26,7 +26,7 @@ jobs:
     name: Copy infra and docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Create projects directory
       uses: garygrossgarten/github-action-ssh@release
