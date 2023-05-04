@@ -12,7 +12,7 @@ services:
     build:
       image: vlad9603/foodgram_front_v1:latest
     volumes:
-      - ./frontend/:/app/result_build/
+      - .foodgram/frontend/:/app/result_build/
       - static_value:/app/result_build/build/static/
     depends_on:
       - db
@@ -34,7 +34,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./frontend/build:/usr/share/nginx/html/
+      - .foodgram/frontend/build:/usr/share/nginx/html/
       - ./docs/:/usr/share/nginx/html/api/docs/
       - static_value:/var/html/static/
       - media_value:/var/html/media/
