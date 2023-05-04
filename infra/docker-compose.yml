@@ -10,8 +10,7 @@ services:
 
   frontend:
     build:
-      context: ../frontend
-      dockerfile: Dockerfile
+      image: vlad9603/foodgram_front_v1:latest
     volumes:
       - ../frontend/:/app/result_build/
       - static_value:/app/result_build/build/static/
@@ -19,7 +18,7 @@ services:
       - db
       
   backend:
-    image: vlad9603/foodgram_v1:latest
+    image: vlad9603/foodgram_back_v1:latest
     restart: always
     volumes:
       - static_value:/app/static/
