@@ -33,7 +33,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        privateKey: ${{ secrets.PASSPHRASE }}
+        passphrase: ${{ secrets.PASSPHRASE }}
         command: cd projects && mkdir -p foodgram && mkdir -p foodgram/docs
 
     - name: Copy infra files
