@@ -12,9 +12,10 @@ SECRET_KEY = os.getenv('DJANGO_KEY', 'some_key')
 DEBUG = os.getenv('DEBUG', default=True)
 
 ALLOWED_HOSTS = [
-    '51.250.97.5',
+    '158.160.53.6',
     '127.0.0.1',
-    'localhost'
+    'localhost',
+    'db',
     ]
 
 INSTALLED_APPS = [
@@ -70,7 +71,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', default='foodgram'),
         'USER': os.getenv('POSTGRES_USER', default='foodgram_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='123456789'),
-        'HOST': os.getenv('DB_HOST', default='127.0.0.1'),
+        'HOST': os.getenv('DB_HOST', default='db'),
         'PORT': os.getenv('DB_PORT', default=5432)
     }
 }
