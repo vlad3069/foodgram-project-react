@@ -1,7 +1,7 @@
 version: '3.3'
 services:
 
-  db:
+  foodgram_db:
     image: postgres:13.0-alpine
     volumes:
       - db_value:/var/lib/postgresql/data/
