@@ -278,7 +278,7 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
         ingredientinrecipe_set = validated_data.pop("ingredientinrecipe_set")
         tags = validated_data.pop("tags")
         instance = Recipe.objects.create(author=request.user, **validated_data)
-        RecipeSerializer.create_ingredientsinrecipe(
+        RecipeSerializer.tags_and_ingredients_set(
             instance, ingredientinrecipe_set)
         instance.tags.set(tags)
         return instance
