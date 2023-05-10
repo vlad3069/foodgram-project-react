@@ -2,8 +2,8 @@ from django.urls import include, path
 from djoser.views import TokenDestroyView
 from rest_framework.routers import DefaultRouter
 
-from api.views import (IngredientViewSet, ReciepeViewSet,
-                       TagViewSet, UserViewSet, TokenCreateView)
+from api.views import (IngredientViewSet, ReciepeViewSet, TagViewSet,
+                       TokenCreateView, UserViewSet)
 
 auth_urls_v1 = [
     path(r'token/login/', TokenCreateView.as_view(), name='login'),

@@ -5,18 +5,18 @@ from djoser.views import TokenCreateView
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from api.filters import ReciepeFilter
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
-from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
-                             RecipeListSerializer, RecipeSerializer,
+from api.serializers import (IngredientSerializer, MySubscriptionSerializer,
+                             RecipeCreateSerializer, RecipeListSerializer,
+                             RecipeSerializer, SetPasswordSerializer,
                              SubscripeSerializer, TagSerializer,
-                             UserCreateSerializer, UserReadSerializer,
-                             SetPasswordSerializer, MySubscriptionSerializer)
+                             UserCreateSerializer, UserReadSerializer)
 from ingredients.models import Ingredient
 from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
                             ShoppingCartRecipe)
