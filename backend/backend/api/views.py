@@ -8,7 +8,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import ReciepeFilter
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -162,7 +161,6 @@ class ReciepeViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPaginator
     edit_permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
-    filterset_class = ReciepeFilter
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
