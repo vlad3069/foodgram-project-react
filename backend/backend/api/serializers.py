@@ -261,15 +261,17 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
             )
         return super().validate(attrs)
 
-    @transaction.atomic
-    def tags_and_ingredients_set(self, recipe, tags, ingredients):
-        recipe.tags.set(tags)
+    @staticmethod
+    def create_ingredientsinrecipe(recipe, ingredientinrecipe_set):
         IngredientInRecipe.objects.bulk_create(
-            [IngredientInRecipe(
-                recipe=recipe,
-                ingredient=Ingredient.objects.get(pk=ingredient['id']),
-                amount=ingredient['amount']
-            ) for ingredient in ingredients]
+            [
+                IngredientInRecipe(
+                    recipe=recipe,
+                    ingredient=item["ingredient"],
+                    amount=item["amount"]
+                )
+                for item in ingredientinrecipe_set
+            ]
         )
 
     @transaction.atomic
@@ -278,7 +280,7 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
         ingredientinrecipe_set = validated_data.pop("ingredientinrecipe_set")
         tags = validated_data.pop("tags")
         instance = Recipe.objects.create(author=request.user, **validated_data)
-        RecipeSerializer.tags_and_ingredients_set(
+        RecipeSerializer.create_ingredientsinrecipe(
             instance, ingredientinrecipe_set)
         instance.tags.set(tags)
         return instance
