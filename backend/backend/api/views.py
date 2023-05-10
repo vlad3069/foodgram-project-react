@@ -159,7 +159,6 @@ class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
 
 class ReciepeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    serializer_class = RecipeListSerializer
     pagination_class = CustomPaginator
     edit_permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
@@ -201,7 +200,7 @@ class ReciepeViewSet(viewsets.ModelViewSet):
 
         if request.method == 'POST':
             serializer = RecipeSerializer(recipe, data=request.data,
-                                          context={"request": request})
+                                          context={'request': request})
             serializer.is_valid(raise_exception=True)
             if not ShoppingCartRecipe.objects.filter(user=request.user,
                                                      recipe=recipe).exists():

@@ -46,6 +46,13 @@ class Recipe(models.Model):
         verbose_name='Теги',
         help_text='Выберите теги',
     )
+    cooking_time = models.PositiveSmallIntegerField(
+        'Время приготовления в минутах',
+        help_text='Введите время приготовления в минутах',
+        validators=[
+            MinValueValidator(1, message='Укажите время больше либо равное 1'),
+        ],
+    )
 
     class Meta:
         ordering = ('-created',)
