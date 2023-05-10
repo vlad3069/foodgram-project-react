@@ -7,15 +7,15 @@ class User(AbstractUser):
 
     username = models.CharField(
         max_length=150,
-        verbose_name='Имя пользователя',
+        verbose_name='юзернейм пользователя',
         unique=True,
         help_text=(
-            'Введите уникальное имя пользователя. Максимум 150 символов. '
+            'Введите юзернейм пользователя. Максимум 150 символов. '
             'Используйте только английские буквы, цифры и символы @/./+/-/_'
         ),
         validators=[ASCIIUsernameValidator()],
         error_messages={
-            'unique': 'Пользователь с таким именем уже существует',
+            'unique': 'Пользователь с таким юзернеймом уже существует',
         },
     )
     email = models.EmailField(

@@ -1,6 +1,6 @@
 from django_filters.rest_framework import FilterSet, filters
 
-from recipes.models import Reciepe
+from recipes.models import Recipe
 from tags.models import Tag
 
 
@@ -14,7 +14,7 @@ class ReciepeFilter(FilterSet):
         method='is_in_shopping_cart_filter')
 
     class Meta:
-        model = Reciepe
+        model = Recipe
         fields = ('tags', 'author',)
 
     def is_favorited_filter(self, queryset, name, value):

@@ -2,10 +2,10 @@ from django.db.models import Sum
 from django.http import Http404, HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import TokenCreateView
-from rest_framework import permissions, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from api.filters import ReciepeFilter
@@ -14,9 +14,11 @@ from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (IngredientSerializer, RecipeCreateSerializer,
                              RecipeListSerializer, RecipeSerializer,
-                             SubscripeSerializer, TagSerializer)
+                             SubscripeSerializer, TagSerializer,
+                             UserCreateSerializer, UserReadSerializer,
+                             SetPasswordSerializer, MySubscriptionSerializer)
 from ingredients.models import Ingredient
-from recipes.models import (FavoriteRecipe, IngredientInRecipe, Reciepe,
+from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
                             ShoppingCartRecipe)
 from tags.models import Tag
 from users.models import Subscription, User
@@ -24,13 +26,70 @@ from users.models import Subscription, User
 
 class TokenCreateView(TokenCreateView):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny,)
 
     def _action(self, serializer):
         response = super()._action(serializer)
         if response.status_code == status.HTTP_200_OK:
             response.status_code = status.HTTP_201_CREATED
         return response
+
+
+class UserViewSet(CreateListDestroyViewSet):
+    queryset = User.objects.all()
+    pagination_class = CustomPaginator
+    permission_classes = (AllowAny,)
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return UserReadSerializer
+        return UserCreateSerializer
+
+    @action(detail=False, methods=['get'],
+            pagination_class=None,
+            permission_classes=(IsAuthenticated,))
+    def me(self, request):
+        serializer = UserReadSerializer(request.user)
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'],
+            permission_classes=(IsAuthenticated,))
+    def set_password(self, request):
+        serializer = SetPasswordSerializer(request.user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response({'detail': 'Пароль успешно изменен!'},
+                        status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'],
+            permission_classes=(IsAuthenticated,),
+            pagination_class=CustomPaginator)
+    def subscriptions(self, request):
+        queryset = User.objects.filter(subscribing__user=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = MySubscriptionSerializer(page, many=True,
+                                              context={'request': request})
+        return self.get_paginated_response(serializer.data)
+
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=(IsAuthenticated,))
+    def subscribe(self, request, **kwargs):
+        author = get_object_or_404(User, id=kwargs['pk'])
+
+        if request.method == 'POST':
+            serializer = SubscripeSerializer(
+                author, data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            Subscription.objects.create(user=request.user, author=author)
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
+
+        if request.method == 'DELETE':
+            get_object_or_404(Subscription, user=request.user,
+                              author=author).delete()
+            return Response({'detail': 'Успешная отписка'},
+                            status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -99,7 +158,7 @@ class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
 
 
 class ReciepeViewSet(viewsets.ModelViewSet):
-    queryset = Reciepe.objects.all()
+    queryset = Recipe.objects.all()
     serializer_class = RecipeListSerializer
     pagination_class = CustomPaginator
     edit_permission_classes = (IsAuthorOrReadOnly,)
@@ -114,7 +173,7 @@ class ReciepeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, **kwargs):
-        recipe = get_object_or_404(Reciepe, id=kwargs['pk'])
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
             serializer = RecipeSerializer(recipe, data=request.data,
@@ -138,7 +197,7 @@ class ReciepeViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,),
             pagination_class=None)
     def shopping_cart(self, request, **kwargs):
-        recipe = get_object_or_404(Reciepe, id=kwargs['pk'])
+        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
             serializer = RecipeSerializer(recipe, data=request.data,

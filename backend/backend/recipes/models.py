@@ -6,7 +6,7 @@ from tags.models import Tag
 from users.models import User, UserСonnection
 
 
-class Reciepe(models.Model):
+class Recipe(models.Model):
     created = models.DateTimeField(
         'Дата создания',
         auto_now_add=True,
@@ -15,7 +15,7 @@ class Reciepe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reciepes',
+        related_name='recipe',
         verbose_name='Автор',
     )
     name = models.CharField(
@@ -26,7 +26,7 @@ class Reciepe(models.Model):
     )
     image = models.ImageField(
         'Картинка',
-        upload_to='Reciepes/',
+        upload_to='Recipes/',
         blank=True,
         null=True,
     )
@@ -60,7 +60,7 @@ class Reciepe(models.Model):
 
 class RecipeСonnection(models.Model):
     recipe = models.ForeignKey(
-        Reciepe,
+        Recipe,
         on_delete=models.CASCADE,
         verbose_name='Рецепт',
         help_text='Выберите рецепт',

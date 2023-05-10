@@ -11,7 +11,14 @@ SECRET_KEY = os.getenv('DJANGO_KEY', 'some_key')
 
 DEBUG = os.getenv('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    '*',
+    'localhost',
+    '127.0.0.1',
+    'backend',
+    'db',
+    '130.193.48.151',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -60,6 +67,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
@@ -67,7 +75,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER', default='foodgram_user'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='123456789'),
         'HOST': os.getenv('DB_HOST', default='db'),
-        'PORT': os.getenv('DB_PORT', default=5432)
+        'PORT': os.getenv('DB_PORT', default=5432),
     }
 }
 
@@ -112,8 +120,8 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
 
     "SERIALIZERS": {
-        "user": "api.serializers.UserSerializer",
-        "current_user": "api.serializers.UserSerializer",
+        "user": "api.serializers.UserReadSerializer",
+        "current_user": "api.serializers.UserReadSerializer",
     },
     "PERMISSIONS": {
         "user": ["rest_framework.permissions.IsAuthenticated"],
