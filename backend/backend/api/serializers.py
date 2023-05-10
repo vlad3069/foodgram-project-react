@@ -152,17 +152,11 @@ class SubscripeSerializer(rest_serialize.ModelSerializer):
             'author',
         )
 
-    def validate(self, attrs):
-        user = self.context.get('request').user
-        author = self.initial_data.get('author')
-        if user == author:
+    def validate(self, obj):
+        if (self.context['request'].user == obj):
             raise rest_serialize.ValidationError(
-                'Нельзя подписаться на самого себя!')
-        if author.subscriptions.filter(user=user).exists():
-            raise rest_serialize.ValidationError(
-                'Нельзя подписаться дважды на одного пользователя!'
-            )
-        return super().validate(attrs)
+                {'errors': 'Ошибка подписки.'})
+        return obj
 
 
 class RecipeListSerializer(rest_serialize.ModelSerializer):
