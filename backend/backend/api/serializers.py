@@ -274,12 +274,14 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(author=self.context['request'].user,
-                                       **validated_data)
-        self.tags_and_ingredients_set(recipe, tags, ingredients)
-        return recipe
+        request = self.context["request"]
+        ingredientinrecipe_set = validated_data.pop("ingredientinrecipe_set")
+        tags = validated_data.pop("tags")
+        instance = Recipe.objects.create(author=request.user, **validated_data)
+        RecipeSerializer.create_ingredientsinrecipe(
+            instance, ingredientinrecipe_set)
+        instance.tags.set(tags)
+        return instance
 
     @transaction.atomic
     def update(self, instance, validated_data):
