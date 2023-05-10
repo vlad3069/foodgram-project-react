@@ -216,7 +216,9 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
                                                  queryset=Tag.objects.all())
     author = UserReadSerializer(read_only=True)
     id = rest_serialize.ReadOnlyField()
-    ingredients = IngredientInRecipeSerializer(many=True)
+    ingredients = IngredientInRecipeSerializer(
+        source="ingredientinrecipe_set", many=True
+    )
     image = Base64ImageField()
 
     class Meta:
