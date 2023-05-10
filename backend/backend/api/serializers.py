@@ -234,27 +234,30 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
             'cooking_time': {'required': True},
         }
 
-    def validate(self, obj):
-        for field in ['name', 'text', 'cooking_time']:
-            if not obj.get(field):
-                raise rest_serialize.ValidationError(
-                    f'{field} - Обязательное поле.'
-                )
-        if not obj.get('tags'):
+    def validate(self, attrs):
+        if len(attrs['tags']) == 0:
             raise rest_serialize.ValidationError(
-                'Нужно указать минимум 1 тег.'
-            )
-        if not obj.get('ingredients'):
+                'Должен быть выбран хотя бы один тег.')
+        if len(attrs['tags']) != len(set(attrs['tags'])):
+            raise rest_serialize.ValidationError("Теги должны быть уникальны.")
+        if len(attrs["ingredientinrecipe_set"]) == 0:
             raise rest_serialize.ValidationError(
-                'Нужно указать минимум 1 ингредиент.'
+                "Должен быть выбран хотя бы один ингредиент."
             )
-        inrgedient_id_list = [item['id'] for item in obj.get('ingredients')]
-        unique_ingredient_id_list = set(inrgedient_id_list)
-        if len(inrgedient_id_list) != len(unique_ingredient_id_list):
+        ingredients = attrs["ingredientinrecipe_set"]
+        if len(ingredients) != len(set(
+                obj["ingredient"] for obj in ingredients)):
             raise rest_serialize.ValidationError(
-                'Ингредиенты должны быть уникальны.'
+                "Ингредиенты должны быть уникальны.")
+        if any(obj["amount"] <= 0 for obj in ingredients):
+            raise rest_serialize.ValidationError(
+                "Количество игредиента должно быть больше нуля."
             )
-        return obj
+        if attrs["cooking_time"] <= 0:
+            raise rest_serialize.ValidationError(
+                "Время приготовления должно быть больше нуля."
+            )
+        return super().validate(attrs)
 
     @transaction.atomic
     def tags_and_ingredients_set(self, recipe, tags, ingredients):
