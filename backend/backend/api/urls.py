@@ -11,22 +11,23 @@ auth_urls_v1 = [
 ]
 
 users_urls_v1 = [
-    path(r'', UserViewSet, 'users'),
-    path(r'<int:id>/', UserViewSet, 'user-detail'),
-    path(r'me/', UserViewSet.as_view(), name='me-detail'),
+    path(r'', UserViewSet.as_view({'get': 'list', 'post': 'create'}), 'users'),
+    path(r'<int:id>/', UserViewSet.as_view(
+        {'get': 'retrieve'}), 'user-detail'),
+    path(r'me/', UserViewSet.as_view({'get': 'me'}), name='me-detail'),
     path(
         r'set_password/',
-        UserViewSet.as_view(),
+        UserViewSet.as_view({'post': 'set_password'}),
         name='set-password',
     ),
     path(
         r'subscriptions/',
-        UserViewSet.as_view(),
+        UserViewSet.as_view({"get": "list"}),
         name='subscriptions',
     ),
     path(
         r'<int:author_id>/subscribe/',
-        UserViewSet.as_view(),
+        UserViewSet.as_view({"post": "create", "delete": "destroy"}),
         name='subscribe',
     ),
 ]
