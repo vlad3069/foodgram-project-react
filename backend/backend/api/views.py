@@ -66,7 +66,7 @@ class UserViewSet(CreateListDestroyViewSet):
             permission_classes=(IsAuthenticated,),
             pagination_class=CustomPaginator)
     def subscriptions(self, request):
-        queryset = User.objects.filter(subscribing__user=request.user)
+        queryset = User.objects.filter(subscriptions__user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = MySubscriptionSerializer(page, many=True,
                                               context={'request': request})
