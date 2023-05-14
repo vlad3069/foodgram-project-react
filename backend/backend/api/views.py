@@ -279,7 +279,6 @@ class ReciepeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request, **kwargs):
-        filename = f'{self.request.user.username}_shopping_list.txt'
         ingredients = (
             IngredientInRecipe.objects
             .filter(recipe__shoppingcartrecipe__user=request.user)
@@ -288,11 +287,12 @@ class ReciepeViewSet(viewsets.ModelViewSet):
             .values_list('ingredient__name', 'total_amount',
                          'ingredient__measurement_unit')
         )
-        file_list = '\nПосчитано в Foodgram'
+        filename = 'shopping_cart.pdf'
+        file_list = []
         [file_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         file = HttpResponse('Cписок покупок:\n' + '\n'.join(file_list),
-                            content_type='text.txt; charset=utf-8')
+                            content_type='application/pdf')
         file['Content-Disposition'] = (
             f'attachment; filename={filename}')
         return file
