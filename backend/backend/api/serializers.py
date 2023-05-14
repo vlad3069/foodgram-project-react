@@ -6,7 +6,7 @@ from drf_base64.fields import Base64ImageField
 from rest_framework import serializers as rest_serialize
 
 from ingredients.models import Ingredient
-from recipes.models import IngredientInRecipe, Recipe, FavoriteRecipe
+from recipes.models import FavoriteRecipe, IngredientInRecipe, Recipe
 from tags.models import Tag
 from users.models import Subscription, User
 
