@@ -19,6 +19,7 @@ class Tag(models.Model):
     slug = models.SlugField(
         'Slug',
         null=False,
+        help_text='Введите Slug',
         unique=True,
     )
 

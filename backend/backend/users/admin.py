@@ -10,7 +10,7 @@ class UserAdmin(UserAdminAuth):
     @admin.display(description='Количество рецептов')
     def recipe_amount(self, user):
         '''Количество рецептов для вывода в админке.'''
-        return user.recipe.count()
+        return user.recipes.count()
 
     def subscription_amount(self, user):
         '''Количество подписчиков для вывода в админке.'''

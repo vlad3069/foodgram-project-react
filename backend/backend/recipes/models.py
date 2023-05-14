@@ -15,8 +15,9 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='recipe',
+        related_name='recipes',
         verbose_name='Автор',
+        help_text='Автор рецепта',
     )
     name = models.CharField(
         'Название',
@@ -29,6 +30,7 @@ class Recipe(models.Model):
         upload_to='Recipes/',
         blank=True,
         null=True,
+        help_text='Добавьте изображение',
     )
     text = models.TextField(
         'Текст поста',

@@ -31,10 +31,12 @@ class User(AbstractUser):
     first_name = models.CharField(
         max_length=150,
         verbose_name='имя',
+        help_text='Введите ваше имя',
     )
     last_name = models.CharField(
         max_length=150,
         verbose_name='фамилия',
+        help_text='Введите вашу фамилию',
     )
 
     class Meta:

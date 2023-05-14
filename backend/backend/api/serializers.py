@@ -6,7 +6,7 @@ from drf_base64.fields import Base64ImageField
 from rest_framework import serializers as rest_serialize
 
 from ingredients.models import Ingredient
-from recipes.models import IngredientInRecipe, Recipe
+from recipes.models import IngredientInRecipe, Recipe, FavoriteRecipe
 from tags.models import Tag
 from users.models import Subscription, User
 
@@ -111,7 +111,18 @@ class IngredientInRecipeSerializer(rest_serialize.ModelSerializer):
         )
 
 
-class MySubscriptionSerializer(rest_serialize.ModelSerializer):
+class RecipeSerializer(rest_serialize.ModelSerializer):
+    image = Base64ImageField(read_only=True)
+    name = rest_serialize.ReadOnlyField()
+    cooking_time = rest_serialize.ReadOnlyField()
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name',
+                  'image', 'cooking_time')
+
+
+class MySubscriptionSerializer(UserReadSerializer):
     recipes = rest_serialize.SerializerMethodField()
     recipes_count = rest_serialize.SerializerMethodField()
 
@@ -123,8 +134,8 @@ class MySubscriptionSerializer(rest_serialize.ModelSerializer):
                   'recipes', 'recipes_count')
         read_only_fields = fields
 
-    def get_recipes(self, user_object):
-        queryset = user_object.recipes.all()
+    def get_recipes(self, obj):
+        queryset = obj.recipes.all()
         recipes_limit = self.context['request'].query_params.get(
             'recipes_limit')
         if recipes_limit is not None:
@@ -135,8 +146,8 @@ class MySubscriptionSerializer(rest_serialize.ModelSerializer):
                 pass
         return RecipeSerializer(queryset, many=True).data
 
-    def get_recipes_count(self, user_object):
-        return user_object.recipes.count()
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
 
 class SubscripeSerializer(rest_serialize.ModelSerializer):
@@ -152,11 +163,17 @@ class SubscripeSerializer(rest_serialize.ModelSerializer):
             'author',
         )
 
-    def validate(self, obj):
-        if (self.context['request'].user == obj):
+    def validate(self, attrs):
+        user = self.context.get('request').user
+        author = self.initial_data.get('author')
+        if user == author:
             raise rest_serialize.ValidationError(
-                {'errors': 'Ошибка подписки.'})
-        return obj
+                'Нельзя подписаться на самого себя!')
+        if author.subscriptions.filter(user=user).exists():
+            raise rest_serialize.ValidationError(
+                'Нельзя подписаться дважды на одного пользователя!'
+            )
+        return super().validate(attrs)
 
 
 class RecipeListSerializer(rest_serialize.ModelSerializer):
@@ -178,11 +195,12 @@ class RecipeListSerializer(rest_serialize.ModelSerializer):
                   'name', 'image',
                   'text', 'cooking_time')
 
-    def get_is_favorited(self, recipe):
-        request = self.context['request']
+    def get_is_favorited(self, obj):
         return (
-            request.user.is_authenticated
-            and recipe.favoriterecipe_set.filter(user=request.user).exists()
+            self.context.get('request').user.is_authenticated
+            and FavoriteRecipe.objects.filter(
+                user=self.context['request'].user,
+                recipe=obj).exists()
         )
 
     def get_is_in_shopping_cart(self, recipe):
@@ -194,26 +212,15 @@ class RecipeListSerializer(rest_serialize.ModelSerializer):
         )
 
 
-class RecipeSerializer(rest_serialize.ModelSerializer):
-    image = Base64ImageField(read_only=True)
-    name = rest_serialize.ReadOnlyField()
-    cooking_time = rest_serialize.ReadOnlyField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name',
-                  'image', 'cooking_time')
-
-
 class RecipeCreateSerializer(rest_serialize.ModelSerializer):
     tags = rest_serialize.PrimaryKeyRelatedField(many=True,
                                                  queryset=Tag.objects.all())
     author = UserReadSerializer(read_only=True)
     id = rest_serialize.ReadOnlyField()
     ingredients = IngredientInRecipeSerializer(
-        source="ingredientinrecipe_set", many=True
+        source='ingredientinrecipe_set', many=True
     )
-    image = Base64ImageField()
+    image = Base64ImageField(max_length=None, use_url=True)
 
     class Meta:
         model = Recipe
@@ -235,23 +242,23 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
             raise rest_serialize.ValidationError(
                 'Должен быть выбран хотя бы один тег.')
         if len(attrs['tags']) != len(set(attrs['tags'])):
-            raise rest_serialize.ValidationError("Теги должны быть уникальны.")
-        if len(attrs["ingredientinrecipe_set"]) == 0:
+            raise rest_serialize.ValidationError('Теги должны быть уникальны.')
+        if len(attrs['ingredientinrecipe_set']) == 0:
             raise rest_serialize.ValidationError(
-                "Должен быть выбран хотя бы один ингредиент."
+                'Должен быть выбран хотя бы один ингредиент.'
             )
-        ingredients = attrs["ingredientinrecipe_set"]
+        ingredients = attrs['ingredientinrecipe_set']
         if len(ingredients) != len(set(
-                obj["ingredient"] for obj in ingredients)):
+                obj['ingredient'] for obj in ingredients)):
             raise rest_serialize.ValidationError(
-                "Ингредиенты должны быть уникальны.")
-        if any(obj["amount"] <= 0 for obj in ingredients):
+                'Ингредиенты должны быть уникальны.')
+        if any(obj['amount'] <= 0 for obj in ingredients):
             raise rest_serialize.ValidationError(
-                "Количество игредиента должно быть больше нуля."
+                'Количество игредиента должно быть больше нуля.'
             )
-        if attrs["cooking_time"] <= 0:
+        if attrs['cooking_time'] <= 0:
             raise rest_serialize.ValidationError(
-                "Время приготовления должно быть больше нуля."
+                'Время приготовления должно быть больше нуля.'
             )
         return super().validate(attrs)
 
@@ -261,8 +268,8 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
             [
                 IngredientInRecipe(
                     recipe=recipe,
-                    ingredient=item["ingredient"],
-                    amount=item["amount"]
+                    ingredient=item['ingredient'],
+                    amount=item['amount']
                 )
                 for item in ingredientinrecipe_set
             ]
@@ -270,9 +277,9 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        request = self.context["request"]
-        ingredientinrecipe_set = validated_data.pop("ingredientinrecipe_set")
-        tags = validated_data.pop("tags")
+        request = self.context['request']
+        ingredientinrecipe_set = validated_data.pop('ingredientinrecipe_set')
+        tags = validated_data.pop('tags')
         instance = Recipe.objects.create(author=request.user, **validated_data)
         self.create_ingredientsinrecipe(
             instance, ingredientinrecipe_set)
@@ -286,12 +293,11 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
         instance.text = validated_data.get('text', instance.text)
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time)
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
+        ingredientinrecipe_set = validated_data.pop('ingredientinrecipe_set')
         IngredientInRecipe.objects.filter(
             recipe=instance,
             ingredient__in=instance.ingredients.all()).delete()
-        self.tags_and_ingredients_set(instance, tags, ingredients)
+        self.create_ingredientsinrecipe(instance, ingredientinrecipe_set)
         instance.save()
         return instance
 
