@@ -288,10 +288,10 @@ class ReciepeViewSet(viewsets.ModelViewSet):
                          'ingredient__measurement_unit')
         )
         file_list = []
-        filename = 'shopping_cart.pdf'
         [file_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         file = HttpResponse('Cписок покупок:\n' + '\n'.join(file_list),
                             content_type='text/plain')
-        file['Content-Disposition'] = (f'attachment; filename={filename}')
+        file['Content-Disposition'] = (
+            f'attachment; filename={"shopping_cart.pdf"}')
         return file
