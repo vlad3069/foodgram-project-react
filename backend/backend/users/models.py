@@ -48,7 +48,7 @@ class User(AbstractUser):
         return self.username[:15]
 
 
-class UserСonnection(models.Model):
+class UserConnection(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -60,7 +60,7 @@ class UserСonnection(models.Model):
         abstract = True
 
 
-class Subscription(UserСonnection):
+class Subscription(UserConnection):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

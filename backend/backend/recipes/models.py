@@ -3,7 +3,7 @@ from django.db import models
 
 from ingredients.models import Ingredient
 from tags.models import Tag
-from users.models import User, UserСonnection
+from users.models import User, UserConnection
 
 
 class Recipe(models.Model):
@@ -67,7 +67,7 @@ class Recipe(models.Model):
         )
 
 
-class RecipeСonnection(models.Model):
+class RecipeConnection(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -79,7 +79,7 @@ class RecipeСonnection(models.Model):
         abstract = True
 
 
-class FavoriteRecipe(RecipeСonnection, UserСonnection):
+class FavoriteRecipe(RecipeConnection, UserConnection):
 
     class Meta:
         constraints = [
@@ -92,7 +92,7 @@ class FavoriteRecipe(RecipeСonnection, UserСonnection):
         verbose_name_plural = 'Любимые рецепты'
 
 
-class ShoppingCartRecipe(RecipeСonnection, UserСonnection):
+class ShoppingCartRecipe(RecipeConnection, UserConnection):
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -104,7 +104,7 @@ class ShoppingCartRecipe(RecipeСonnection, UserСonnection):
         verbose_name_plural = 'Рецепты в корзинах пользователей'
 
 
-class IngredientInRecipe(RecipeСonnection):
+class IngredientInRecipe(RecipeConnection):
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
@@ -127,7 +127,7 @@ class IngredientInRecipe(RecipeСonnection):
         )
 
 
-class TagRecipe(RecipeСonnection):
+class TagRecipe(RecipeConnection):
     tag = models.ForeignKey(
         Tag,
         on_delete=models.DO_NOTHING,

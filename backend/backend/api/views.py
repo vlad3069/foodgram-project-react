@@ -1,13 +1,14 @@
 from django.db.models import Sum
-from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponse, JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import TokenCreateView
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from api.filters import FilterRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -18,7 +19,7 @@ from api.serializers import (IngredientSerializer, MySubscriptionSerializer,
                              UserCreateSerializer, UserReadSerializer)
 from ingredients.models import Ingredient
 from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
-                            ShoppingCartRecipe, TagRecipe)
+                            ShoppingCartRecipe)
 from tags.models import Tag
 from users.models import Subscription, User
 
@@ -104,19 +105,11 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-
-    def get_queryset(self):
-        queryset = Ingredient.objects.all()
-        name = self.request.query_params.get('name')
-        if name:
-            filter1 = queryset.filter(name__istartswith=name)
-            filter1and2 = queryset.filter(
-                ~Q(name__istartswith=name) & Q(name__icontains=name)
-            )
-            queryset = list(filter1) + list(filter1and2)
-        return queryset
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['^name', ]
 
 
 class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
@@ -169,7 +162,10 @@ class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
 
 
 class ReciepeViewSet(viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
     edit_permission_classes = (IsAuthorOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = FilterRecipe
 
     def get_permissions(self):
         if self.action in (
@@ -185,46 +181,6 @@ class ReciepeViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'partial_update'):
             return RecipeCreateSerializer
         return RecipeListSerializer
-
-    def get_queryset(self):
-        queryset = Recipe.objects.all()
-        user = self.request.user
-        is_favorited = self.request.query_params.get('is_favorited')
-        if is_favorited:
-            recipes_id = (
-                FavoriteRecipe.objects.filter(user=user).values('recipe__id')
-                if user.is_authenticated
-                else []
-            )
-            condition = Q(id__in=recipes_id)
-            queryset = queryset.filter(
-                condition if is_favorited == '1' else ~condition
-            ).all()
-        is_in_shopping_cart = self.request.query_params.get(
-            'is_in_shopping_cart')
-        if is_in_shopping_cart:
-            recipes_id = (
-                ShoppingCartRecipe.objects.filter(user=user).values(
-                    'recipe__id')
-                if user.is_authenticated
-                else []
-            )
-            condition = Q(id__in=recipes_id)
-            queryset = queryset.filter(
-                condition if is_in_shopping_cart == '1' else ~condition
-            ).all()
-        author_id = self.request.query_params.get('author')
-        if author_id:
-            queryset = queryset.filter(author__id=author_id).all()
-        tags = self.request.query_params.getlist('tags')
-        if tags:
-            tags = Tag.objects.filter(slug__in=tags).all()
-            recipes_id = (
-                TagRecipe.objects.filter(tag__in=tags).values(
-                    'recipe__id').distinct()
-            )
-            queryset = queryset.filter(id__in=recipes_id)
-        return queryset
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))

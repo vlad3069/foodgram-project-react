@@ -34,16 +34,11 @@ class UserCreateSerializer(djoser_serialize.UserCreateSerializer):
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name',
                   'password')
-        extra_kwargs = {
-            'first_name': {'required': True, 'allow_blank': False},
-            'last_name': {'required': True, 'allow_blank': False},
-            'email': {'required': True, 'allow_blank': False},
-        }
 
     def validate(self, obj):
         invalid_usernames = ['me', 'set_password',
                              'subscriptions', 'subscribe']
-        if self.initial_data.get('username') in invalid_usernames:
+        if self.initial_data.get('username'.lower()) in invalid_usernames:
             raise rest_serialize.ValidationError(
                 {'username': 'Вы не можете использовать этот username.'}
             )
@@ -228,14 +223,6 @@ class RecipeCreateSerializer(rest_serialize.ModelSerializer):
                   'tags', 'image',
                   'name', 'text',
                   'cooking_time', 'author')
-        extra_kwargs = {
-            'ingredients': {'required': True, 'allow_blank': False},
-            'tags': {'required': True, 'allow_blank': False},
-            'name': {'required': True, 'allow_blank': False},
-            'text': {'required': True, 'allow_blank': False},
-            'image': {'required': True, 'allow_blank': False},
-            'cooking_time': {'required': True},
-        }
 
     def validate(self, attrs):
         if len(attrs['tags']) == 0:
