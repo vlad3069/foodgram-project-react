@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import TokenCreateView
@@ -8,7 +9,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import FilterIngridientInRecipe, FilterRecipe
+from api.filters import FilterRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -105,11 +106,19 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = (DjangoFilterBackend, )
-    filterset_class = FilterIngridientInRecipe
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        name = self.request.query_params.get('name')
+        if name:
+            filter1 = queryset.filter(name__istartswith=name)
+            filter1and2 = queryset.filter(
+                ~Q(name__istartswith=name) & Q(name__icontains=name)
+            )
+            queryset = list(filter1) + list(filter1and2)
+        return queryset
 
 
 class RecipesSubscriptionViewSet(CreateListDestroyViewSet):

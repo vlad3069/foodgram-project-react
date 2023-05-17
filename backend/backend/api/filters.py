@@ -1,9 +1,7 @@
 from django.db.models.query_utils import Q
 from django_filters.rest_framework import FilterSet, filters
 
-from ingredients.models import Ingredient
-from recipes.models import (FavoriteRecipe, Recipe,
-                            ShoppingCartRecipe)
+from recipes.models import FavoriteRecipe, Recipe, ShoppingCartRecipe
 from tags.models import Tag
 
 
@@ -51,22 +49,4 @@ class FilterRecipe(FilterSet):
             queryset = queryset.filter(
                 condition if is_in_shopping_cart == '1' else ~condition
             ).all()
-        return queryset
-
-
-class FilterIngridientInRecipe(FilterSet):
-    queryset = Ingredient.objects.all()
-
-    class Meta:
-        model = Ingredient
-        fields = ('name', )
-
-    def get_queryset(self, queryset, name, value):
-        name = self.request.query_params.get('name')
-        if name:
-            filter1 = queryset.filter(name__istartswith=name)
-            filter1and2 = queryset.filter(
-                ~Q(name__istartswith=name) & Q(name__icontains=name)
-            )
-            queryset = list(filter1) + list(filter1and2)
         return queryset
