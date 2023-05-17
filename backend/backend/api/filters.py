@@ -3,7 +3,8 @@ from django_filters.rest_framework import FilterSet, filters
 from rest_framework.filters import SearchFilter
 
 from ingredients.models import Ingredient
-from recipes.models import FavoriteRecipe, Recipe, ShoppingCartRecipe
+from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
+                            ShoppingCartRecipe)
 from tags.models import Tag
 
 
@@ -55,8 +56,12 @@ class FilterRecipe(FilterSet):
 
 
 class FilterIngridientInRecipe(SearchFilter):
-    def get_search_fields(self, view, request):
-        queryset = Ingredient.objects.all()
+    queryset = Ingredient.objects.all()
+
+    class Meta:
+        model = IngredientInRecipe
+
+    def get_queryset(self, view, request, queryset):
         name = self.request.query_params.get('name')
         if name:
             filter1 = queryset.filter(name__istartswith=name)
