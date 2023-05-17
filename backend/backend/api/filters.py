@@ -61,7 +61,7 @@ class FilterIngridientInRecipe(FilterSet):
 
     class Meta:
         model = IngredientInRecipe
-        fields = ('name', )
+        fields = ('ingredient', )
 
     def is_name_similar_filter(self, queryset, name, value):
         name = self.request.query_params.get('name')
