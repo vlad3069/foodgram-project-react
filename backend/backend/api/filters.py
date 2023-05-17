@@ -2,7 +2,7 @@ from django.db.models.query_utils import Q
 from django_filters.rest_framework import FilterSet, filters
 
 from ingredients.models import Ingredient
-from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
+from recipes.models import (FavoriteRecipe, Recipe,
                             ShoppingCartRecipe)
 from tags.models import Tag
 
@@ -60,8 +60,8 @@ class FilterIngridientInRecipe(FilterSet):
         method='is_name_similar_filter')
 
     class Meta:
-        model = IngredientInRecipe
-        fields = ('ingredient', )
+        model = Ingredient
+        fields = ('name', )
 
     def is_name_similar_filter(self, queryset, name, value):
         name = self.request.query_params.get('name')
