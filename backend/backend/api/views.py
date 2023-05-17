@@ -2,13 +2,13 @@ from django.db.models import Sum
 from django.http import Http404, HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import TokenCreateView
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import FilterRecipe
+from api.filters import FilterIngridientInRecipe, FilterRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -108,8 +108,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['^name', ]
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = FilterIngridientInRecipe
 
 
 class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
@@ -233,12 +233,12 @@ class ReciepeViewSet(viewsets.ModelViewSet):
             .values_list('ingredient__name', 'total_amount',
                          'ingredient__measurement_unit')
         )
-        filename = 'shopping_cart.txt'
+        filename = "shopping_cart.txt"
         file_list = []
         [file_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         file = HttpResponse('Cписок покупок:\n' + '\n'.join(file_list),
-                            content_type='application/txt')
+                            content_type='application.txt')
         file['Content-Disposition'] = (
             f'attachment; filename={filename}')
         return file
