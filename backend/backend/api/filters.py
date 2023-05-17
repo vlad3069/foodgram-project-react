@@ -1,5 +1,6 @@
 from django.db.models.query_utils import Q
 from django_filters.rest_framework import FilterSet, filters
+from rest_framework.filters import SearchFilter
 
 from ingredients.models import Ingredient
 from recipes.models import FavoriteRecipe, Recipe, ShoppingCartRecipe
@@ -53,10 +54,9 @@ class FilterRecipe(FilterSet):
         return queryset
 
 
-class FilterIngridientInRecipe(filters.BaseFilterBackend):
-    queryset = Ingredient.objects.all()
-
-    def ingridient_filter(self, queryset, name, view):
+class FilterIngridientInRecipe(SearchFilter):
+    def get_search_fields(self, view, request):
+        queryset = Ingredient.objects.all()
         name = self.request.query_params.get('name')
         if name:
             filter1 = queryset.filter(name__istartswith=name)

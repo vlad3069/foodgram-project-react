@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import FilterIngridientInRecipe, FilterRecipe
+from api.filters import FilterRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -109,7 +109,6 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = [filters.SearchFilter]
-    filterset_class = FilterIngridientInRecipe
     search_fields = ['^name', ]
 
 
