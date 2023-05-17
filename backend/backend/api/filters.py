@@ -1,6 +1,5 @@
 from django.db.models.query_utils import Q
 from django_filters.rest_framework import FilterSet, filters
-from rest_framework.filters import SearchFilter
 
 from ingredients.models import Ingredient
 from recipes.models import (FavoriteRecipe, IngredientInRecipe, Recipe,
@@ -55,14 +54,16 @@ class FilterRecipe(FilterSet):
         return queryset
 
 
-class FilterIngridientInRecipe(SearchFilter):
+class FilterIngridientInRecipe(FilterSet):
     queryset = Ingredient.objects.all()
+    is_name_similar = filters.BooleanFilter(
+        method='is_name_similar_filter')
 
     class Meta:
         model = IngredientInRecipe
-        fields = ('tags', 'author',)
+        fields = ('name', )
 
-    def get_queryset(self, view, request, queryset):
+    def is_name_similar_filter(self, queryset, name, value):
         name = self.request.query_params.get('name')
         if name:
             filter1 = queryset.filter(name__istartswith=name)
