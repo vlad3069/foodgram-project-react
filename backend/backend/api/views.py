@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import FilterRecipe
+from api.filters import FilterRecipe, FilterIngridientInRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly
@@ -109,6 +109,7 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = [filters.SearchFilter]
+    filterset_class = FilterIngridientInRecipe
     search_fields = ['^name', ]
 
 
@@ -163,19 +164,9 @@ class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
 
 class ReciepeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    edit_permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = FilterRecipe
-
-    def get_permissions(self):
-        if self.action in (
-            'destroy',
-            'partial_update',
-        ):
-            return [
-                permission() for permission in self.edit_permission_classes
-                ]
-        return super().get_permissions()
 
     def get_serializer_class(self):
         if self.action in ('create', 'partial_update'):
@@ -243,12 +234,12 @@ class ReciepeViewSet(viewsets.ModelViewSet):
             .values_list('ingredient__name', 'total_amount',
                          'ingredient__measurement_unit')
         )
-        filename = 'shopping_cart.pdf'
+        filename = 'shopping_cart.txt'
         file_list = []
         [file_list.append(
             '{} - {} {}.'.format(*ingredient)) for ingredient in ingredients]
         file = HttpResponse('Cписок покупок:\n' + '\n'.join(file_list),
-                            content_type='application/pdf')
+                            content_type='application/txt')
         file['Content-Disposition'] = (
             f'attachment; filename={filename}')
         return file

@@ -3,6 +3,7 @@ from django_filters.rest_framework import FilterSet, filters
 
 from recipes.models import FavoriteRecipe, Recipe, ShoppingCartRecipe
 from tags.models import Tag
+from ingredients.models import Ingredient
 
 
 class FilterRecipe(FilterSet):
@@ -49,4 +50,18 @@ class FilterRecipe(FilterSet):
             queryset = queryset.filter(
                 condition if is_in_shopping_cart == '1' else ~condition
             ).all()
+        return queryset
+
+
+class FilterIngridientInRecipe(filters.BaseFilterBackend):
+    queryset = Ingredient.objects.all()
+
+    def ingridient_filter(self, queryset, name, view):
+        name = self.request.query_params.get('name')
+        if name:
+            filter1 = queryset.filter(name__istartswith=name)
+            filter1and2 = queryset.filter(
+                ~Q(name__istartswith=name) & Q(name__icontains=name)
+            )
+            queryset = list(filter1) + list(filter1and2)
         return queryset

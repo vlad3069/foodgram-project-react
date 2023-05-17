@@ -38,7 +38,7 @@ class UserCreateSerializer(djoser_serialize.UserCreateSerializer):
     def validate(self, obj):
         invalid_usernames = ['me', 'set_password',
                              'subscriptions', 'subscribe']
-        if self.initial_data.get('username'.lower()) in invalid_usernames:
+        if self.initial_data.get('username').lower() in invalid_usernames:
             raise rest_serialize.ValidationError(
                 {'username': 'Вы не можете использовать этот username.'}
             )
