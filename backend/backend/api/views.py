@@ -8,7 +8,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from api.filters import FilterRecipe, FilterIngridientInRecipe
+from api.filters import FilterIngridientInRecipe, FilterRecipe
 from api.mixins import CreateListDestroyViewSet
 from api.pagination import CustomPaginator
 from api.permissions import IsAuthorOrReadOnly

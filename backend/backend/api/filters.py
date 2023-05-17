@@ -1,9 +1,9 @@
 from django.db.models.query_utils import Q
 from django_filters.rest_framework import FilterSet, filters
 
+from ingredients.models import Ingredient
 from recipes.models import FavoriteRecipe, Recipe, ShoppingCartRecipe
 from tags.models import Tag
-from ingredients.models import Ingredient
 
 
 class FilterRecipe(FilterSet):
