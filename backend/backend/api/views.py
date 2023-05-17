@@ -1,4 +1,5 @@
 from django.db.models import Sum
+from django.db.models.query_utils import Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import TokenCreateView
@@ -110,6 +111,17 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (filters.SearchFilter, )
     search_fields = ('^name', )
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        name = self.request.query_params.get('name')
+        if name:
+            filter1 = queryset.filter(name__istartswith=name)
+            filter1and2 = queryset.filter(
+                ~Q(name__istartswith=name) & Q(name__icontains=name)
+            )
+            queryset = list(filter1) + list(filter1and2)
+        return queryset
 
 
 class RecipesSubscriptionViewSet(CreateListDestroyViewSet):
