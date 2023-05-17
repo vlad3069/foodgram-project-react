@@ -56,14 +56,12 @@ class FilterRecipe(FilterSet):
 
 class FilterIngridientInRecipe(FilterSet):
     queryset = Ingredient.objects.all()
-    is_name_similar = filters.BooleanFilter(
-        method='is_name_similar_filter')
 
     class Meta:
         model = Ingredient
         fields = ('name', )
 
-    def is_name_similar_filter(self, queryset, name, value):
+    def get_queryset(self, queryset, name, value):
         name = self.request.query_params.get('name')
         if name:
             filter1 = queryset.filter(name__istartswith=name)
