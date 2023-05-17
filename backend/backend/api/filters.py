@@ -60,6 +60,7 @@ class FilterIngridientInRecipe(SearchFilter):
 
     class Meta:
         model = IngredientInRecipe
+        fields = ('tags', 'author',)
 
     def get_queryset(self, view, request, queryset):
         name = self.request.query_params.get('name')
