@@ -123,7 +123,8 @@ class IngredientInRecipe(RecipeConnection):
 
     def __str__(self):
         return (
-            f'{self.ingredient.name} — {self.amount} {self.ingredient.measure}'
+            f'{self.ingredient.name} — '
+            f'{self.amount} {self.ingredient.measurement_unit}'
         )
 
 
