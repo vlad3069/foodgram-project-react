@@ -27,5 +27,5 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return (f'Название: {self.name[:15]}'
-                f'Адрес: {str(self.measurement_unit)}'
+                f'Количество: {str(self.measurement_unit)}'
                 )
