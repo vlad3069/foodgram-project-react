@@ -1,11 +1,25 @@
+# Foodrgam
 
 [![API FoodGram Project CI/CD](https://github.com/vlad3069/foodgram-project-react/actions/workflows/foodgram_workflo.yml/badge.svg)](https://github.com/vlad3069/foodgram-project-react/actions/workflows/foodgram_workflo.yml)
 
-# Foodrgam
+## Описание
 
  Продуктовый помощник - дипломный проект курса Backend-разработки Яндекс.Практикум. Проект представляет собой онлайн-сервис и API для него. На этом сервисе пользователи могут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
 
 Проект реализован на `Django` и `DjangoRestFramework`. Доступ к данным реализован через API-интерфейс. Документация к API написана с использованием `Redoc`.
+
+### Технологии
+
+- Python 3.8
+- Django 3.2
+- Django Rest Framework 3.12.4
+- Simple JWT
+- PostgreSQL 13.0-alpine
+- Nginx 1.21.3-alpine
+- Gunicorn 20.0.4
+- Docker 20.10.17
+- Docker-compose 3.8
+- Яндекс.Облако
 
 ## Особенности реализации
 
@@ -18,10 +32,7 @@
     Пароль: admin
     Емайл: admin@mail.com
 
-
 ## Развертывание проекта
-
-### Развертывание на локальном сервере
 
 1. Установите на сервере `docker` и `docker-compose`.
 2. Создайте файл `/infra/.env`.
